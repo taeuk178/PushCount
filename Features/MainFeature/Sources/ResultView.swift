@@ -83,7 +83,7 @@ struct ResultView: View {
             }
             
             Button {
-                //
+                
             } label: {
                 Text("홈으로 돌아가기")
             }
