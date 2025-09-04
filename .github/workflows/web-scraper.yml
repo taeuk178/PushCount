@@ -1,0 +1,49 @@
+name: Web Scraper with Email Notification
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 매일 오전 9시 (UTC) = 오후 6시 (한국시간)
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  scrape-and-notify:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 lxml
+        
+    - name: Run web scraper
+      run: |
+        python simple_scraper.py > scraper_results.txt
+        echo "스크래핑 완료 시간: $(date)" >> scraper_results.txt
+        
+    - name: Send email notification
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        secure: true
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "[웹 크롤링 결과] $(date +'%Y-%m-%d %H:%M:%S')"
+        to: nous178@icloud.com
+        from: 웹 크롤러 봇
+        body: |
+          안녕하세요! 웹 크롤링이 완료되었습니다.
+          
+          실행 시간: $(date)
+          상태: 성공 ✅
+          
+          상세 결과는 첨부파일을 확인해주세요.
+        attachments: scraper_results.txt
