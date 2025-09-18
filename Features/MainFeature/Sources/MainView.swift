@@ -6,13 +6,14 @@ public struct MainView: View {
     public init() {}
     
     @State private var showingActionView = false
+    @State private var todayPushCount = 0
     
     public var body: some View {
         VStack(spacing: 30) {
             VStack(spacing: 10) {
                 Text("오늘의 푸시업")
                 
-                Text("38")
+                Text("\(todayPushCount)")
                     .font(.system(size: 48))
             }
             
@@ -29,7 +30,9 @@ public struct MainView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15))
             }
             .fullScreenCover(isPresented: $showingActionView) {
-                ActionView()
+                ActionView { completedPushCount in
+                    todayPushCount += completedPushCount
+                }
             }
         }
     }

@@ -7,7 +7,7 @@ public enum MainFeatureImpl {
         MainView()
     }
     
-    public static func makeActionView() -> some View {
-        ActionView()
+    public static func makeActionView(onComplete: @escaping (Int) -> Void) -> some View {
+        ActionView(onComplete: onComplete)
     }
 }
