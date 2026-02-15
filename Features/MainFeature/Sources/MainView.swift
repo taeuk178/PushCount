@@ -95,6 +95,7 @@ public struct MainView: View {
 }
 
 private struct ExerciseCardView: View {
+    
     let exercise: ExerciseCard
     
     var body: some View {
