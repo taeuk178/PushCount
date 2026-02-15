@@ -12,8 +12,14 @@ struct ActionView: View {
     
     @State private var pushCount: Int = 0
     @State private var showResultView = false
+    let exerciseTitle: String
     let onComplete: (Int) -> Void
     @Environment(\.dismiss) private var dismiss
+    
+    init(exerciseTitle: String = "PUSH UPS", onComplete: @escaping (Int) -> Void) {
+        self.exerciseTitle = exerciseTitle
+        self.onComplete = onComplete
+    }
     
     var body: some View {
         
@@ -40,6 +46,9 @@ struct ActionView: View {
                     }
                 }
             }
+            
+            Text(exerciseTitle)
+                .font(.system(size: 24, weight: .bold))
             
             Text("\(pushCount)")
                 .font(.system(size: 60, weight: .bold))
