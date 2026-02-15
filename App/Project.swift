@@ -6,15 +6,6 @@ let project = Project(
     name: "PushCount",
     targets: [
         .target(
-            name: "Shared",
-            destinations: .iOS,
-            product: .framework,
-            bundleId: "com.tuist.PushCount.Shared",
-            deploymentTargets: .iOS(targetVersion),
-            sources: ["Shared/**"],
-            dependencies: []
-        ),
-        .target(
             name: "PushCount",
             destinations: .iOS,
             product: .app,
@@ -31,14 +22,13 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "Shared"),
                 .project(
                     target: "SettingFeature",
                     path: "../Features/SettingFeature"
                 ),
                 .project(
-                    target: "MainFeature",
-                    path: "../Features/MainFeature"
+                    target: "HomeFeature",
+                    path: "../Features/HomeFeature"
                 ),
                 .project(
                     target: "RecordFeature",

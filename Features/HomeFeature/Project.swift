@@ -4,13 +4,13 @@ import ProjectDescription
 let targetVersion: String = "18.1"
 
 let project = Project(
-    name: "MainFeature",
+    name: "HomeFeature",
     targets: [
         .target(
-            name: "MainFeatureInterface",
+            name: "HomeFeatureInterface",
             destinations: .iOS,
             product: .framework,
-            bundleId: "com.tuist.PushCount.MainFeatureInterface",
+            bundleId: "com.tuist.PushCount.HomeFeatureInterface",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Interface/**"],
             dependencies: [
@@ -18,23 +18,22 @@ let project = Project(
             ]
         ),
         .target(
-            name: "MainFeature",
+            name: "HomeFeature",
             destinations: .iOS,
             product: .framework,
-            bundleId: "com.tuist.PushCount.MainFeature",
+            bundleId: "com.tuist.PushCount.HomeFeature",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "MainFeatureInterface"),
-                .project(target: "Shared", path: "../../App")
+                .target(name: "HomeFeatureInterface")
             ]
         ),
         .target(
-            name: "MainFeatureExample",
+            name: "HomeFeatureExample",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.tuist.PushCount.MainFeatureExample",
+            bundleId: "com.tuist.PushCount.HomeFeatureExample",
             deploymentTargets: .iOS(targetVersion),
             infoPlist: .extendingDefault(
                 with: [
@@ -46,7 +45,7 @@ let project = Project(
             ),
             sources: ["Example/**"],
             dependencies: [
-                .target(name: "MainFeature")
+                .target(name: "HomeFeature")
             ]
         )
     ]

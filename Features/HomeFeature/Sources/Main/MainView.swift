@@ -1,7 +1,8 @@
 import SwiftUI
-import MainFeatureInterface
 
-public struct MainView: View {
+import HomeFeatureInterface
+
+public struct HomeView: View {
     
     public init() {}
     
@@ -166,8 +167,8 @@ private struct ExerciseCard {
     }
 }
 
-struct MainView_Previews: PreviewProvider {
+struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView()
+        HomeView()
     }
 }

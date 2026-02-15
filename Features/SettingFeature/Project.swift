@@ -23,8 +23,7 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "SettingFeatureInterface"),
-                .project(target: "Shared", path: "../../App")
+                .target(name: "SettingFeatureInterface")                
             ]
         ),
         .target(

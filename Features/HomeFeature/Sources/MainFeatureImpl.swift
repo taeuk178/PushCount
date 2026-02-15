@@ -1,10 +1,10 @@
 import SwiftUI
-import MainFeatureInterface
+import HomeFeatureInterface
 
-public enum MainFeatureImpl {
+public enum HomeFeatureImpl {
     
-    public static func makeMainView() -> some View {
-        MainView()
+    public static func makeHomeView() -> some View {
+        HomeView()
     }
     
     public static func makeActionView(onComplete: @escaping (Int) -> Void) -> some View {

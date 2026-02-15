@@ -1,7 +1,7 @@
 import SwiftUI
 
-public enum MainFeatureFactory {
-    public static func makeSettingView() -> some View {
+public enum HomeFeatureFactory {
+    public static func makeHomeView() -> some View {
         // Implementation will be provided by the concrete feature
         EmptyView()
     }

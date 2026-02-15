@@ -26,8 +26,7 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "RecordFeatureInterface"),
-                .project(target: "Shared", path: "../../App")
+                .target(name: "RecordFeatureInterface") 
             ]
         ),
         .target(
