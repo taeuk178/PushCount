@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Notion__notion-update-page",
+      "mcp__plugin_oh-my-claudecode_x__ask_codex",
+      "mcp__plugin_oh-my-claudecode_g__ask_gemini",
+      "mcp__plugin_oh-my-claudecode_g__wait_for_job",
+      "mcp__plugin_oh-my-claudecode_x__wait_for_job",
+      "Bash(gemini usage:*)",
+      "Bash(gpt usage:*)"
+    ]
+  }
+}
