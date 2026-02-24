@@ -3,7 +3,7 @@ import SwiftUI
 import RecordFeature
 
 @main
-struct MainFeatureExampleApp: App {
+struct RecordFeatureExampleApp: App {
     var body: some Scene {
         WindowGroup {
             RecordFeatureImpl.makeRecordView()

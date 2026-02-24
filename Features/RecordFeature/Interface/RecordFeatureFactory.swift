@@ -1,9 +1,9 @@
 
 import SwiftUI
 
-public enum MainFeatureFactory {
+public enum RecordFeatureFactory {
     
-    public static func makeSettingView() -> some View {
+    public static func makeRecordView() -> some View {
         EmptyView()
     }
 }

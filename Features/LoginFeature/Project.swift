@@ -4,13 +4,13 @@ import ProjectDescription
 let targetVersion: String = "18.1"
 
 let project = Project(
-    name: "HomeFeature",
+    name: "LoginFeature",
     targets: [
         .target(
-            name: "HomeFeatureInterface",
+            name: "LoginFeatureInterface",
             destinations: .iOS,
             product: .framework,
-            bundleId: "com.tuist.PushCount.HomeFeatureInterface",
+            bundleId: "com.tuist.PushCount.LoginFeatureInterface",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Interface/**"],
             dependencies: [
@@ -18,22 +18,25 @@ let project = Project(
             ]
         ),
         .target(
-            name: "HomeFeature",
+            name: "LoginFeature",
             destinations: .iOS,
             product: .framework,
-            bundleId: "com.tuist.PushCount.HomeFeature",
+            bundleId: "com.tuist.PushCount.LoginFeature",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "HomeFeatureInterface")
+                .target(name: "LoginFeatureInterface"),
+                .project(target: "NetworkKit", path: "../../Modules/NetworkKit"),
+                .external(name: "KakaoSDKUser"),
+                .external(name: "KakaoSDKAuth")
             ]
         ),
         .target(
-            name: "HomeFeatureExample",
+            name: "LoginFeatureExample",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.tuist.PushCount.HomeFeatureExample",
+            bundleId: "com.tuist.PushCount.LoginFeatureExample",
             deploymentTargets: .iOS(targetVersion),
             infoPlist: .extendingDefault(
                 with: [
@@ -45,11 +48,7 @@ let project = Project(
             ),
             sources: ["Example/**"],
             dependencies: [
-                .target(name: "HomeFeature"),
-                .project(
-                    target: "DesignSystemKit",
-                    path: .relativeToRoot("Modules/DesignSystemKit")
-                )
+                .target(name: "LoginFeature")
             ]
         )
     ]

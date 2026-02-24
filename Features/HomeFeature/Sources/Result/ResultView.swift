@@ -1,12 +1,12 @@
 //
 //  ResultView.swift
-//  MainFeature
+//  HomeFeature
 //
 //  Created by taeuk on 8/30/25.
 //
 
 import SwiftUI
-import MainFeatureInterface
+import HomeFeatureInterface
 
 struct ResultView: View {
     

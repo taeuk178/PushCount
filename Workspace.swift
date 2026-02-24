@@ -4,6 +4,7 @@ let workspace = Workspace(
     name: "PushCount",
     projects: [
         "App",
-        "Features/**"
+        "Features/**",
+        "Modules/**"
     ]
 )
