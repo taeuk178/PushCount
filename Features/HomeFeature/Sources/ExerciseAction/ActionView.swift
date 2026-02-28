@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HomeFeatureInterface
+import DesignSystemKit
 
 struct ActionView: View {
     
@@ -31,14 +32,14 @@ struct ActionView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [Color.black, Color(red: 0.14, green: 0.05, blue: 0.01), Color.black],
+                colors: [DesignColor.black, DesignColor.deepOrangeBackground, DesignColor.black],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
             
             Circle()
-                .fill(Color(red: 1, green: 0.33, blue: 0).opacity(0.20))
+                .fill(DesignColor.brandOrange.opacity(0.20))
                 .frame(width: 520, height: 520)
                 .blur(radius: 60)
                 .offset(y: 100)
@@ -87,11 +88,11 @@ private extension ActionView {
             VStack(spacing: 4) {
                 Text(exerciseTitle)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                    .foregroundStyle(DesignColor.brandOrange)
                 
                 Text("목표: \(targetCount) 회")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.65))
+                    .foregroundStyle(DesignColor.white.opacity(0.65))
             }
             
             Spacer()
@@ -106,32 +107,32 @@ private extension ActionView {
         VStack(spacing: 26) {
             Text("탭해서 횟수 올리기")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.85))
+                .foregroundStyle(DesignColor.white.opacity(0.85))
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
-                .background(Color.white.opacity(0.08))
+                .background(DesignColor.white.opacity(0.08))
                 .clipShape(Capsule())
                 .padding(.top, 36)
             
             ZStack {
                 Circle()
-                    .stroke(Color(red: 1, green: 0.33, blue: 0).opacity(0.22), lineWidth: 1)
+                    .stroke(DesignColor.brandOrange.opacity(0.22), lineWidth: 1)
                     .frame(width: 250, height: 250)
                 
                 Circle()
-                    .stroke(Color(red: 1, green: 0.33, blue: 0).opacity(0.10), lineWidth: 1)
+                    .stroke(DesignColor.brandOrange.opacity(0.10), lineWidth: 1)
                     .frame(width: 320, height: 320)
                 
                 VStack(spacing: 6) {
                     Text("\(pushCount)")
                         .font(.system(size: 132, weight: .heavy))
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(DesignColor.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                     
                     Text("회 완료")
                         .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                        .foregroundStyle(DesignColor.brandOrange)
                 }
             }
             .padding(.top, 16)
@@ -159,13 +160,13 @@ private extension ActionView {
                 } label: {
                     ZStack {
                         Circle()
-                            .fill(Color(red: 1, green: 0.33, blue: 0))
+                            .fill(DesignColor.brandOrange)
                             .frame(width: 94, height: 94)
-                            .shadow(color: Color(red: 1, green: 0.33, blue: 0).opacity(0.4), radius: 16)
+                            .shadow(color: DesignColor.brandOrange.opacity(0.4), radius: 16)
                         
                         Image(systemName: isPaused ? "play.fill" : "pause.fill")
                             .font(.system(size: 30, weight: .bold))
-                            .foregroundStyle(Color.white)
+                            .foregroundStyle(DesignColor.white)
                     }
                 }
                 .buttonStyle(.plain)
@@ -181,11 +182,11 @@ private extension ActionView {
         VStack(spacing: 4) {
             Text(title)
                 .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(Color.white.opacity(0.45))
+                .foregroundStyle(DesignColor.white.opacity(0.45))
             
             Text(value)
                 .font(.system(size: 40, weight: .heavy))
-                .foregroundStyle(Color.white)
+                .foregroundStyle(DesignColor.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -194,12 +195,12 @@ private extension ActionView {
     func circleIconButton(systemName: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Circle()
-                .fill(Color.white.opacity(0.10))
+                .fill(DesignColor.white.opacity(0.10))
                 .frame(width: 40, height: 40)
                 .overlay {
                     Image(systemName: systemName)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(Color.white.opacity(0.88))
+                        .foregroundStyle(DesignColor.white.opacity(0.88))
                 }
         }
         .buttonStyle(.plain)
@@ -209,21 +210,21 @@ private extension ActionView {
         Button(action: action) {
             VStack(spacing: 10) {
                 Circle()
-                    .fill(Color.white.opacity(0.08))
+                    .fill(DesignColor.white.opacity(0.08))
                     .frame(width: 48, height: 48)
                     .overlay {
                         Circle()
-                            .stroke(Color.white.opacity(0.18), lineWidth: 2)
+                            .stroke(DesignColor.white.opacity(0.18), lineWidth: 2)
                     }
                     .overlay {
                         Image(systemName: systemName)
                             .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(Color.white.opacity(0.88))
+                            .foregroundStyle(DesignColor.white.opacity(0.88))
                     }
                 
                 Text(title)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color.white.opacity(0.55))
+                    .foregroundStyle(DesignColor.white.opacity(0.55))
             }
         }
         .buttonStyle(.plain)

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HomeFeatureInterface
+import DesignSystemKit
 
 struct ResultView: View {
     
@@ -16,20 +17,20 @@ struct ResultView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [Color.black, Color(red: 0.16, green: 0.06, blue: 0.01), Color.black],
+                colors: [DesignColor.black, DesignColor.deepOrangeBackgroundStrong, DesignColor.black],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
             
             Circle()
-                .fill(Color(red: 1, green: 0.33, blue: 0).opacity(0.16))
+                .fill(DesignColor.brandOrange.opacity(0.16))
                 .frame(width: 360, height: 360)
                 .blur(radius: 40)
                 .offset(x: 110, y: 190)
             
             Circle()
-                .fill(Color(red: 1, green: 0.33, blue: 0).opacity(0.08))
+                .fill(DesignColor.brandOrange.opacity(0.08))
                 .frame(width: 260, height: 260)
                 .blur(radius: 30)
                 .offset(x: -120, y: -170)
@@ -61,16 +62,16 @@ private extension ResultView {
             VStack(alignment: .leading, spacing: 4) {
                 Text("운동 결과 요약")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                    .foregroundStyle(DesignColor.brandOrange)
                     .tracking(1.2)
                 
                 Text("수고하셨습니다!")
                     .font(.system(size: 26, weight: .heavy))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DesignColor.white)
                 
                 Text("\(formatDateInKorean(Date())) • 맨몸 운동")
                     .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
+                    .foregroundStyle(DesignColor.slate400)
             }
             
             Spacer()
@@ -79,12 +80,12 @@ private extension ResultView {
                 onDismiss(pushCount)
             } label: {
                 Circle()
-                    .fill(Color.white.opacity(0.10))
+                    .fill(DesignColor.white.opacity(0.10))
                     .frame(width: 40, height: 40)
                     .overlay {
                         Image(systemName: "xmark")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(Color.white.opacity(0.9))
+                            .foregroundStyle(DesignColor.white.opacity(0.9))
                     }
             }
             .buttonStyle(.plain)
@@ -97,7 +98,7 @@ private extension ResultView {
                 .font(.system(size: 120, weight: .black))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Color(red: 1, green: 0.39, blue: 0.06), Color(red: 1, green: 0.62, blue: 0.24)],
+                        colors: [DesignColor.brandOrangeGradientStart, DesignColor.brandOrangeGradientEnd],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -107,7 +108,7 @@ private extension ResultView {
             
             Text("총 횟수 (푸시업)")
                 .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
+                .foregroundStyle(DesignColor.slate400)
                 .tracking(0.6)
         }
     }
@@ -135,13 +136,13 @@ private extension ResultView {
         VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 34, weight: .heavy))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignColor.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             
             Text(label)
                 .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(Color(red: 0.42, green: 0.45, blue: 0.50))
+                .foregroundStyle(DesignColor.slate500)
         }
         .frame(maxWidth: .infinity)
     }
@@ -157,11 +158,11 @@ private extension ResultView {
                 .frame(maxWidth: .infinity)
                 .frame(height: 58)
                 .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(.white)
-                .background(Color.clear)
+                .foregroundStyle(DesignColor.white)
+                .background(DesignColor.clear)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                        .stroke(DesignColor.white.opacity(0.18), lineWidth: 1)
                 }
             }
             .buttonStyle(.plain)
@@ -176,10 +177,10 @@ private extension ResultView {
                 .frame(maxWidth: .infinity)
                 .frame(height: 66)
                 .font(.system(size: 22, weight: .black))
-                .foregroundStyle(Color.black.opacity(0.85))
-                .background(Color(red: 1, green: 0.33, blue: 0))
+                .foregroundStyle(DesignColor.black.opacity(0.85))
+                .background(DesignColor.brandOrange)
                 .clipShape(Capsule())
-                .shadow(color: Color(red: 1, green: 0.33, blue: 0).opacity(0.35), radius: 16)
+                .shadow(color: DesignColor.brandOrange.opacity(0.35), radius: 16)
             }
         }
     }

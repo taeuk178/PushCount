@@ -1,6 +1,7 @@
 
 import SwiftUI
 import LoginFeatureInterface
+import DesignSystemKit
 
 public struct LoginView: View {
 
@@ -10,7 +11,7 @@ public struct LoginView: View {
     
     public var body: some View {
         ZStack {
-            Color(red: 0.0, green: 0.19, blue: 0.29)
+            DesignColor.loginBackground
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -42,7 +43,7 @@ private extension LoginView {
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 22, weight: .regular))
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(DesignColor.white)
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
@@ -55,14 +56,14 @@ private extension LoginView {
         VStack(spacing: 16) {
             Text("BODY\nFIT")
                 .font(.system(size: 72, weight: .heavy))
-                .foregroundStyle(Color(red: 0.95, green: 0.96, blue: 0.98))
+                .foregroundStyle(DesignColor.slateLight)
                 .multilineTextAlignment(.center)
                 .lineSpacing(-8)
                 .tracking(-1.6)
             
             Text("당신의 한계를 뛰어넘으세요")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(red: 0.97, green: 0.50, blue: 0.0))
+                .foregroundStyle(DesignColor.brandOrange)
         }
         .frame(maxWidth: .infinity)
     }
@@ -75,7 +76,7 @@ private extension LoginView {
                 HStack(spacing: 16) {
                     if viewModel.isLoading {
                         ProgressView()
-                            .tint(Color(red: 0.06, green: 0.09, blue: 0.16))
+                            .tint(DesignColor.kakaoText)
                     } else {
                         Image(systemName: "bubble.left")
                             .font(.system(size: 21, weight: .medium))
@@ -84,10 +85,10 @@ private extension LoginView {
                     Text("Kakao로 로그인")
                         .font(.system(size: 18, weight: .bold))
                 }
-                .foregroundStyle(Color(red: 0.06, green: 0.09, blue: 0.16))
+                .foregroundStyle(DesignColor.kakaoText)
                 .frame(maxWidth: .infinity)
                 .frame(height: 64)
-                .background(Color(red: 0.996, green: 0.898, blue: 0.0))
+                .background(DesignColor.kakaoYellow)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .buttonStyle(.plain)
@@ -99,7 +100,7 @@ private extension LoginView {
                 HStack(spacing: 16) {
                     if viewModel.isLoading {
                         ProgressView()
-                            .tint(Color.white)
+                            .tint(DesignColor.white)
                     } else {
                         Image(systemName: "applelogo")
                             .font(.system(size: 18, weight: .semibold))
@@ -108,14 +109,14 @@ private extension LoginView {
                     Text("Apple로 로그인")
                         .font(.system(size: 18, weight: .bold))
                 }
-                .foregroundStyle(Color.white)
+                .foregroundStyle(DesignColor.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 64)
-                .background(Color.black)
+                .background(DesignColor.black)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(red: 0.15, green: 0.15, blue: 0.17), lineWidth: 1)
+                        .stroke(DesignColor.blackButtonBorder, lineWidth: 1)
                 }
             }
             .buttonStyle(.plain)
@@ -135,7 +136,7 @@ private extension LoginView {
     var termsText: some View {
         Text("로그인 시 BodyFit의 이용약관 및 개인정보처리방침에 동의합니다.")
             .font(.system(size: 12, weight: .regular))
-            .foregroundStyle(Color(red: 0.40, green: 0.46, blue: 0.55))
+            .foregroundStyle(DesignColor.slate600)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
     }

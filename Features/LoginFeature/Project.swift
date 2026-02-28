@@ -27,6 +27,10 @@ let project = Project(
             dependencies: [
                 .target(name: "LoginFeatureInterface"),
                 .project(
+                    target: "DesignSystemKit",
+                    path: .relativeToRoot("Modules/DesignSystemKit")
+                ),
+                .project(
                     target: "NetworkKit",
                     path: .relativeToRoot("Modules/NetworkKit")
                 )

@@ -1,5 +1,6 @@
 import SwiftUI
 import SettingFeatureInterface
+import DesignSystemKit
 
 public struct SettingView: View {
     
@@ -13,16 +14,16 @@ public struct SettingView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("환경 설정")
                         .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                        .foregroundStyle(DesignColor.brandOrange)
                         .tracking(1.2)
                     
                     Text("설정")
                         .font(.system(size: 32, weight: .heavy))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignColor.white)
                     
                     Text("앱 환경과 운동 환경을 관리하세요")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
+                        .foregroundStyle(DesignColor.slate400)
                 }
                 
                 settingsSection(title: "일반") {
@@ -64,15 +65,15 @@ private extension SettingView {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignColor.white)
             
             VStack(spacing: 0) {
                 content()
             }
-            .background(Color.white.opacity(0.05))
+            .background(DesignColor.white.opacity(0.05))
             .overlay {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color(red: 1, green: 0.33, blue: 0).opacity(0.28), lineWidth: 1)
+                    .stroke(DesignColor.brandOrange.opacity(0.28), lineWidth: 1)
             }
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }
@@ -82,28 +83,28 @@ private extension SettingView {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                .foregroundStyle(DesignColor.brandOrange)
                 .frame(width: 26)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DesignColor.white)
                 Text(subtitle)
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.48))
+                    .foregroundStyle(DesignColor.white.opacity(0.48))
             }
             
             Spacer()
             
             Toggle("", isOn: isOn)
                 .labelsHidden()
-                .tint(Color(red: 1, green: 0.33, blue: 0))
+                .tint(DesignColor.brandOrange)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 14)
         .overlay(alignment: .bottom) {
-            Divider().background(Color.white.opacity(0.08))
+            Divider().background(DesignColor.white.opacity(0.08))
         }
     }
     
@@ -111,18 +112,18 @@ private extension SettingView {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                .foregroundStyle(DesignColor.brandOrange)
                 .frame(width: 26)
             
             Text(title)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignColor.white)
             
             Spacer()
             
             Text(value)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.6))
+                .foregroundStyle(DesignColor.white.opacity(0.6))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 14)
@@ -134,30 +135,30 @@ private extension SettingView {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                    .foregroundStyle(DesignColor.brandOrange)
                     .frame(width: 26)
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignColor.white)
                     Text(subtitle)
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.48))
+                        .foregroundStyle(DesignColor.white.opacity(0.48))
                 }
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color.white.opacity(0.45))
+                    .foregroundStyle(DesignColor.white.opacity(0.45))
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 14)
         }
         .buttonStyle(.plain)
         .overlay(alignment: .bottom) {
-            Divider().background(Color.white.opacity(0.08))
+            Divider().background(DesignColor.white.opacity(0.08))
         }
     }
 }

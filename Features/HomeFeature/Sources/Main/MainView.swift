@@ -1,6 +1,7 @@
 import SwiftUI
 
 import HomeFeatureInterface
+import DesignSystemKit
 
 public struct HomeView: View {
     
@@ -17,7 +18,7 @@ public struct HomeView: View {
             subtitle: "가슴 • 삼두 • 코어",
             intensity: "고강도",
             duration: "10분",
-            colors: [Color(red: 0.06, green: 0.16, blue: 0.34), Color.black]
+            colors: [DesignColor.homeCardPush, DesignColor.black]
         ),
         ExerciseCard(
             titleTop: "PULL",
@@ -25,7 +26,7 @@ public struct HomeView: View {
             subtitle: "등 • 이두 • 코어",
             intensity: "중강도",
             duration: "12분",
-            colors: [Color(red: 0.07, green: 0.25, blue: 0.30), Color.black]
+            colors: [DesignColor.homeCardPull, DesignColor.black]
         ),
         ExerciseCard(
             titleTop: "SQUAT",
@@ -33,19 +34,19 @@ public struct HomeView: View {
             subtitle: "하체 • 둔근 • 코어",
             intensity: "고강도",
             duration: "15분",
-            colors: [Color(red: 0.20, green: 0.14, blue: 0.08), Color.black]
+            colors: [DesignColor.homeCardSquat, DesignColor.black]
         )
     ]
     
     public var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black
+            DesignColor.black
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 32) {
                 Text("오늘의 운동 시작해볼까요?")
                     .font(.system(size: 32, weight: .heavy))
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(DesignColor.white)
                     .padding(.horizontal, 24)
                     .padding(.top, 12)
                 
@@ -63,7 +64,7 @@ public struct HomeView: View {
                     VStack(spacing: 12) {
                         Text("선택된 운동: \(exercises[selectedExerciseIndex].displayName)")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color(red: 1, green: 0.55, blue: 0.35))
+                            .foregroundStyle(DesignColor.brandOrangeSoft)
                         
                         Button {
                             showingActionView = true
@@ -75,10 +76,10 @@ public struct HomeView: View {
                             }
                             .frame(width: 210, height: 64)
                             .font(.system(size: 28, weight: .heavy))
-                            .foregroundStyle(Color.white)
-                            .background(Color(red: 1, green: 0.33, blue: 0))
+                            .foregroundStyle(DesignColor.white)
+                            .background(DesignColor.brandOrange)
                             .clipShape(Capsule())
-                            .shadow(color: Color(red: 1, green: 0.33, blue: 0).opacity(0.45), radius: 16)
+                            .shadow(color: DesignColor.brandOrange.opacity(0.45), radius: 16)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -111,32 +112,32 @@ private struct ExerciseCardView: View {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: 26)
-                        .stroke(Color(red: 1, green: 0.33, blue: 0).opacity(0.6), lineWidth: 1)
+                        .stroke(DesignColor.brandOrange.opacity(0.6), lineWidth: 1)
                 }
             
             VStack(alignment: .leading, spacing: 8) {
                 Text(exercise.titleTop)
                     .font(.system(size: 56, weight: .black))
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(DesignColor.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 
                 Text(exercise.titleBottom)
                     .font(.system(size: 56, weight: .black))
-                    .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                    .foregroundStyle(DesignColor.brandOrange)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 
                 VStack(alignment: .leading, spacing: 14) {
                     Text(exercise.subtitle)
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Color(red: 0.82, green: 0.84, blue: 0.87))
+                        .foregroundStyle(DesignColor.slate300)
                     
                     HStack(spacing: 12) {
                         Label(exercise.intensity, systemImage: "flame.fill")
-                            .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                            .foregroundStyle(DesignColor.brandOrange)
                         Label(exercise.duration, systemImage: "timer")
-                            .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                            .foregroundStyle(DesignColor.brandOrange)
                     }
                     .font(.system(size: 14, weight: .semibold))
                 }

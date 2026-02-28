@@ -1,6 +1,7 @@
 
 import SwiftUI
 import RecordFeatureInterface
+import DesignSystemKit
 
 public struct RecordView: View {
     
@@ -17,16 +18,16 @@ public struct RecordView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("활동 기록")
                         .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                        .foregroundStyle(DesignColor.brandOrange)
                         .tracking(1.2)
                     
                     Text("히스토리")
                         .font(.system(size: 32, weight: .heavy))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignColor.white)
                     
                     Text("최근 운동 결과를 한눈에 확인하세요")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
+                        .foregroundStyle(DesignColor.slate400)
                 }
                 
                 HStack(spacing: 12) {
@@ -38,7 +39,7 @@ public struct RecordView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("기록 목록")
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignColor.white)
                     
                     ForEach(records) { record in
                         historyCard(record: record)
@@ -55,21 +56,21 @@ public struct RecordView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(Color.white.opacity(0.5))
+                .foregroundStyle(DesignColor.white.opacity(0.5))
             
             Text(value)
                 .font(.system(size: 20, weight: .heavy))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignColor.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 14)
-        .background(Color.white.opacity(0.06))
+        .background(DesignColor.white.opacity(0.06))
         .overlay {
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                .stroke(DesignColor.white.opacity(0.08), lineWidth: 1)
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -80,21 +81,21 @@ public struct RecordView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(record.title)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignColor.white)
                     
                     Text(record.date)
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.48))
+                        .foregroundStyle(DesignColor.white.opacity(0.48))
                 }
                 
                 Spacer()
                 
                 Text("완료")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                    .foregroundStyle(DesignColor.brandOrange)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(Color(red: 1, green: 0.33, blue: 0).opacity(0.14))
+                    .background(DesignColor.brandOrange.opacity(0.14))
                     .clipShape(Capsule())
             }
             
@@ -105,10 +106,10 @@ public struct RecordView: View {
             }
         }
         .padding(16)
-        .background(Color.white.opacity(0.05))
+        .background(DesignColor.white.opacity(0.05))
         .overlay {
             RoundedRectangle(cornerRadius: 14)
-                .stroke(Color(red: 1, green: 0.33, blue: 0).opacity(0.28), lineWidth: 1)
+                .stroke(DesignColor.brandOrange.opacity(0.28), lineWidth: 1)
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
@@ -120,10 +121,10 @@ public struct RecordView: View {
             Text(text)
                 .font(.system(size: 12, weight: .semibold))
         }
-        .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+        .foregroundStyle(DesignColor.brandOrange)
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color(red: 1, green: 0.33, blue: 0).opacity(0.12))
+        .background(DesignColor.brandOrange.opacity(0.12))
         .clipShape(Capsule())
     }
 }
