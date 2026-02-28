@@ -8,62 +8,53 @@ public struct SettingView: View {
     public init() {}
     
     public var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color.black, Color(red: 0.14, green: 0.05, blue: 0.01), Color.black],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 24) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("환경 설정")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
-                            .tracking(1.2)
-                        
-                        Text("설정")
-                            .font(.system(size: 32, weight: .heavy))
-                            .foregroundStyle(.white)
-                        
-                        Text("앱 환경과 운동 환경을 관리하세요")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
-                    }
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("환경 설정")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                        .tracking(1.2)
                     
-                    settingsSection(title: "일반") {
-                        settingsToggleRow(
-                            icon: "iphone.radiowaves.left.and.right",
-                            title: "진동 피드백",
-                            subtitle: "카운트 시 햅틱 피드백",
-                            isOn: $hapticFeedbackEnabled
-                        )
-                        settingsInfoRow(
-                            icon: "info.circle",
-                            title: "앱 버전",
-                            value: "1.0.0"
-                        )
-                    }
+                    Text("설정")
+                        .font(.system(size: 32, weight: .heavy))
+                        .foregroundStyle(.white)
                     
-                    settingsSection(title: "지원") {
-                        settingsLinkRow(
-                            icon: "questionmark.circle",
-                            title: "도움말",
-                            subtitle: "앱 사용 방법과 FAQ"
-                        )
-                        settingsLinkRow(
-                            icon: "envelope",
-                            title: "문의하기",
-                            subtitle: "개발팀에 피드백 보내기"
-                        )
-                    }
+                    Text("앱 환경과 운동 환경을 관리하세요")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 52)
-                .padding(.bottom, 28)
+                
+                settingsSection(title: "일반") {
+                    settingsToggleRow(
+                        icon: "iphone.radiowaves.left.and.right",
+                        title: "진동 피드백",
+                        subtitle: "카운트 시 햅틱 피드백",
+                        isOn: $hapticFeedbackEnabled
+                    )
+                    settingsInfoRow(
+                        icon: "info.circle",
+                        title: "앱 버전",
+                        value: "1.0.0"
+                    )
+                }
+                
+                settingsSection(title: "지원") {
+                    settingsLinkRow(
+                        icon: "questionmark.circle",
+                        title: "도움말",
+                        subtitle: "앱 사용 방법과 FAQ"
+                    )
+                    settingsLinkRow(
+                        icon: "envelope",
+                        title: "문의하기",
+                        subtitle: "개발팀에 피드백 보내기"
+                    )
+                }
             }
+            .padding(.horizontal, 24)
+            .padding(.top, 52)
+            .padding(.bottom, 28)
         }
     }
 }

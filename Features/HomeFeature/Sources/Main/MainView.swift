@@ -109,18 +109,10 @@ private struct ExerciseCardView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .overlay(alignment: .topTrailing) {
-                    Circle()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(width: 180, height: 180)
-                        .blur(radius: 30)
-                        .offset(x: 45, y: -35)
-                }
                 .overlay {
                     RoundedRectangle(cornerRadius: 26)
                         .stroke(Color(red: 1, green: 0.33, blue: 0).opacity(0.6), lineWidth: 1)
                 }
-                .shadow(color: Color(red: 1, green: 0.33, blue: 0).opacity(0.35), radius: 18)
             
             VStack(alignment: .leading, spacing: 8) {
                 Text(exercise.titleTop)

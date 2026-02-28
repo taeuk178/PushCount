@@ -12,51 +12,42 @@ public struct RecordView: View {
     ]
     
     public var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color.black, Color(red: 0.15, green: 0.05, blue: 0.01), Color.black],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 24) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("활동 기록")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
-                            .tracking(1.2)
-                        
-                        Text("히스토리")
-                            .font(.system(size: 32, weight: .heavy))
-                            .foregroundStyle(.white)
-                        
-                        Text("최근 운동 결과를 한눈에 확인하세요")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
-                    }
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("활동 기록")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color(red: 1, green: 0.33, blue: 0))
+                        .tracking(1.2)
                     
-                    HStack(spacing: 12) {
-                        summaryCard(title: "총 운동", value: "\(records.count)회")
-                        summaryCard(title: "총 횟수", value: "\(records.map(\.reps).reduce(0, +))회")
-                        summaryCard(title: "칼로리", value: "\(records.map(\.calories).reduce(0, +))kcal")
-                    }
+                    Text("히스토리")
+                        .font(.system(size: 32, weight: .heavy))
+                        .foregroundStyle(.white)
                     
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("기록 목록")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(.white)
-                        
-                        ForEach(records) { record in
-                            historyCard(record: record)
-                        }
+                    Text("최근 운동 결과를 한눈에 확인하세요")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Color(red: 0.61, green: 0.64, blue: 0.69))
+                }
+                
+                HStack(spacing: 12) {
+                    summaryCard(title: "총 운동", value: "\(records.count)회")
+                    summaryCard(title: "총 횟수", value: "\(records.map(\.reps).reduce(0, +))회")
+                    summaryCard(title: "칼로리", value: "\(records.map(\.calories).reduce(0, +))kcal")
+                }
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("기록 목록")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(.white)
+                    
+                    ForEach(records) { record in
+                        historyCard(record: record)
                     }
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 52)
-                .padding(.bottom, 28)
             }
+            .padding(.horizontal, 24)
+            .padding(.top, 52)
+            .padding(.bottom, 28)
         }
     }
     
