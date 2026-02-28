@@ -9,7 +9,7 @@ let project = Project(
         .target(
             name: "LoginFeatureInterface",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.LoginFeatureInterface",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Interface/**"],
@@ -20,16 +20,16 @@ let project = Project(
         .target(
             name: "LoginFeature",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.LoginFeature",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Sources/**"],
-            resources: ["Resources/**"],
             dependencies: [
                 .target(name: "LoginFeatureInterface"),
-                .project(target: "NetworkKit", path: "../../Modules/NetworkKit"),
-                .external(name: "KakaoSDKUser"),
-                .external(name: "KakaoSDKAuth")
+                .project(
+                    target: "NetworkKit",
+                    path: .relativeToRoot("Modules/NetworkKit")
+                )
             ]
         ),
         .target(
@@ -48,7 +48,11 @@ let project = Project(
             ),
             sources: ["Example/**"],
             dependencies: [
-                .target(name: "LoginFeature")
+                .target(name: "LoginFeature"),
+                .project(
+                    target: "NetworkKit",
+                    path: .relativeToRoot("Modules/NetworkKit")
+                )
             ]
         )
     ]

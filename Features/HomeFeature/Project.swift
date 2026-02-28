@@ -9,7 +9,7 @@ let project = Project(
         .target(
             name: "HomeFeatureInterface",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.HomeFeatureInterface",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Interface/**"],
@@ -20,13 +20,17 @@ let project = Project(
         .target(
             name: "HomeFeature",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.HomeFeature",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "HomeFeatureInterface")
+                .target(name: "HomeFeatureInterface"),
+                .project(
+                    target: "DesignSystemKit",
+                    path: .relativeToRoot("Modules/DesignSystemKit")
+                )
             ]
         ),
         .target(
@@ -45,11 +49,7 @@ let project = Project(
             ),
             sources: ["Example/**"],
             dependencies: [
-                .target(name: "HomeFeature"),
-                .project(
-                    target: "DesignSystemKit",
-                    path: .relativeToRoot("Modules/DesignSystemKit")
-                )
+                .target(name: "HomeFeature")
             ]
         )
     ]

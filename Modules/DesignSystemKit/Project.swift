@@ -17,7 +17,10 @@ let project = Project(
                 "Sources/**"
             ],
             dependencies: [
-                
+                .project(
+                    target: "FoundationCoreKit",
+                    path: .relativeToRoot("Modules/FoundationCoreKit")
+                )
             ]
         )
     ]

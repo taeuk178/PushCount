@@ -9,7 +9,7 @@ let project = Project(
         .target(
             name: "RecordFeatureInterface",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.RecordFeatureInterface",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Interface/**"],
@@ -20,13 +20,17 @@ let project = Project(
         .target(
             name: "RecordFeature",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.RecordFeature",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "RecordFeatureInterface") 
+                .target(name: "RecordFeatureInterface"),
+                .project(
+                    target: "DesignSystemKit",
+                    path: .relativeToRoot("Modules/DesignSystemKit")
+                )
             ]
         ),
         .target(

@@ -22,7 +22,6 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .external(name: "Supabase", condition: .none),
                 .project(
                     target: "SettingFeature",
                     path: "../Features/SettingFeature"

@@ -21,7 +21,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/kakao/kakao-ios-sdk",
-            from: "2.22.0"
+            from: "2.27.2"
         )
     ]
 )

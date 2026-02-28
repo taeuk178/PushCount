@@ -8,7 +8,7 @@ let project = Project(
         .target(
             name: "SettingFeatureInterface",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.SettingFeatureInterface",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Interface/**"],
@@ -17,13 +17,17 @@ let project = Project(
         .target(
             name: "SettingFeature",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.tuist.PushCount.SettingFeature",
             deploymentTargets: .iOS(targetVersion),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "SettingFeatureInterface")                
+                .target(name: "SettingFeatureInterface"),
+                .project(
+                    target: "DesignSystemKit",
+                    path: .relativeToRoot("Modules/DesignSystemKit")
+                )
             ]
         ),
         .target(

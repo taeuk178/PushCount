@@ -4,7 +4,7 @@ import Supabase
 public final class AuthService {
     public static let shared = AuthService()
 
-    private let client = SupabaseClient.shared.client
+    private let client = SupabaseKeyValue.client
     private let tableName = "users"
 
     private init() {}
@@ -46,7 +46,7 @@ public final class AuthService {
             .from(tableName)
             .select()
             .eq("id", value: id.uuidString)
-            .maybeSingle()
+//            .maybeSingle()
             .execute()
             .value
 
