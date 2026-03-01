@@ -28,8 +28,12 @@ public struct LoginView: View {
                 loginButtons
                     .padding(.horizontal, 24)
                 
+                loginStatus
+                    .padding(.top, 16)
+                    .padding(.horizontal, 24)
+
                 termsText
-                    .padding(.top, 50)
+                    .padding(.top, 28)
                     .padding(.bottom, 32)
             }
         }
@@ -133,6 +137,28 @@ private extension LoginView {
         }
     }
     
+    @ViewBuilder
+    var loginStatus: some View {
+        if viewModel.isLoggedIn {
+            VStack(spacing: 4) {
+                Text("로그인 성공")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(DesignColor.brandOrange)
+                if let name = viewModel.loggedInUserName, !name.isEmpty {
+                    Text(name)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(DesignColor.slate300)
+                }
+                if let email = viewModel.loggedInUserEmail, !email.isEmpty {
+                    Text(email)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(DesignColor.slate400)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
     var termsText: some View {
         Text("로그인 시 BodyFit의 이용약관 및 개인정보처리방침에 동의합니다.")
             .font(.system(size: 12, weight: .regular))

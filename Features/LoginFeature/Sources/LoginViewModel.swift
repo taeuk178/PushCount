@@ -2,19 +2,19 @@
 import Foundation
 import KakaoSDKUser
 import KakaoSDKAuth
-import AuthenticationServices
+import NetworkKit
 
 @MainActor
 @Observable
-public final class LoginViewModel: NSObject {
+public final class LoginViewModel {
 
     public var isLoading = false
     public var errorMessage: String?
     public var isLoggedIn = false
+    public var loggedInUserName: String?
+    public var loggedInUserEmail: String?
 
-    public override init() {
-        super.init()
-    }
+    public init() {}
 
     // MARK: - 카카오 로그인
 
@@ -102,12 +102,27 @@ public final class LoginViewModel: NSObject {
     // MARK: - 애플 로그인
 
     public func loginWithApple() {
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = [.fullName, .email]
+        isLoading = true
+        errorMessage = nil
 
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.performRequests()
+        Task {
+            do {
+                let appleUser = try await AuthService.shared.appleSignIn.signIn()
+
+                isLoading = false
+                isLoggedIn = true
+                loggedInUserName = appleUser.name
+                loggedInUserEmail = appleUser.email
+
+                print("✅ Apple 로그인 성공")
+                print("  - userId: \(appleUser.userId)")
+                print("  - email: \(appleUser.email ?? "없음")")
+                print("  - name: \(appleUser.name ?? "없음")")
+            } catch {
+                isLoading = false
+                errorMessage = "Apple 로그인 실패: \(error.localizedDescription)"
+            }
+        }
     }
 
     // MARK: - Supabase에 사용자 저장
@@ -119,35 +134,7 @@ public final class LoginViewModel: NSObject {
         name: String?,
         profileImageUrl: String?
     ) async {
-        // ⚠️ 실제 구현에서는 NetworkKit의 AuthService 사용
-        // import NetworkKit 후 아래 코드 활성화
-
-        /*
-        do {
-            let request = UserUpsertRequest(
-                userId: userId,
-                provider: provider,
-                email: email,
-                name: name,
-                profileImageUrl: profileImageUrl
-            )
-
-            let savedUser = try await AuthService.shared.upsertUser(request)
-
-            print("✅ 사용자 저장 성공: \(savedUser)")
-
-            // 로그인 완료 처리
-            self.isLoggedIn = true
-
-            // UserDefaults에 사용자 ID 저장 (다음 실행 시 자동 로그인용)
-            UserDefaults.standard.set(savedUser.id.uuidString, forKey: "currentUserId")
-
-        } catch {
-            self.errorMessage = "사용자 정보 저장 실패: \(error.localizedDescription)"
-        }
-        */
-
-        // 임시: 콘솔에 출력
+        // Supabase 저장은 현재 비활성화, 로그인 동작 확인용 처리
         print("📝 저장할 사용자 정보:")
         print("  - User ID: \(userId)")
         print("  - Provider: \(provider)")
@@ -155,56 +142,8 @@ public final class LoginViewModel: NSObject {
         print("  - Name: \(name ?? "없음")")
         print("  - Profile Image: \(profileImageUrl ?? "없음")")
 
+        loggedInUserName = name
+        loggedInUserEmail = email
         isLoggedIn = true
     }
-}
-
-// MARK: - ASAuthorizationControllerDelegate
-
-extension LoginViewModel: ASAuthorizationControllerDelegate {
-
-    public func authorizationController(
-        controller: ASAuthorizationController,
-        didCompleteWithAuthorization authorization: ASAuthorization
-    ) {
-        guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-            errorMessage = "Apple 인증 정보를 가져올 수 없습니다"
-            return
-        }
-
-        let userId = credential.user
-        let email = credential.email
-        let fullName = credential.fullName
-
-        var name: String?
-        if let givenName = fullName?.givenName, let familyName = fullName?.familyName {
-            name = "\(familyName)\(givenName)"
-        }
-
-        Task {
-            await saveUserToSupabase(
-                userId: userId,
-                provider: .apple,
-                email: email,
-                name: name,
-                profileImageUrl: nil
-            )
-        }
-    }
-
-    public func authorizationController(
-        controller: ASAuthorizationController,
-        didCompleteWithError error: Error
-    ) {
-        Task { @MainActor in
-            self.errorMessage = "Apple 로그인 실패: \(error.localizedDescription)"
-        }
-    }
-}
-
-// MARK: - AuthProvider 임시 정의 (NetworkKit import 후 제거)
-
-public enum AuthProvider: String, Codable {
-    case kakao
-    case apple
 }
