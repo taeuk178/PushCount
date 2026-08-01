@@ -50,6 +50,7 @@ public struct RecordView: View {
             .padding(.top, 52)
             .padding(.bottom, 28)
         }
+        .background(DesignColor.black)
     }
     
     private func summaryCard(title: String, value: String) -> some View {
