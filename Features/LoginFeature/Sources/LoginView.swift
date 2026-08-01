@@ -2,128 +2,94 @@
 import SwiftUI
 import LoginFeatureInterface
 import DesignSystemKit
+import CharacterKit
 
 public struct LoginView: View {
 
     @State private var viewModel = LoginViewModel()
 
     public init() {}
-    
+
     public var body: some View {
         ZStack {
-            DesignColor.loginBackground
+            DesignColor.canvas
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
-                topBar
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
-                
-                centerContent
-                    .padding(.horizontal, 24)
-                    .padding(.top, 58)
-                
-                Spacer()
-                
+                Spacer(minLength: 0)
+
+                PushUpCharacterView(
+                    phase: 0.7,
+                    mood: .resting,
+                    palette: DesignColor.brand,
+                    scale: 1.2
+                )
+
+                titleBlock
+                    .padding(.top, DesignSpacing.sm)
+
+                Spacer(minLength: 0)
+
                 loginButtons
-                    .padding(.horizontal, 24)
-                
+
                 loginStatus
-                    .padding(.top, 16)
-                    .padding(.horizontal, 24)
 
                 termsText
-                    .padding(.top, 28)
-                    .padding(.bottom, 32)
+                    .padding(.top, DesignSpacing.md)
             }
+            .padding(.horizontal, DesignSpacing.screen)
+            .padding(.bottom, DesignSpacing.lg)
         }
     }
 }
 
 private extension LoginView {
-    var topBar: some View {
-        HStack {
-            Button {
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 22, weight: .regular))
-                    .foregroundStyle(DesignColor.white)
-                    .frame(width: 24, height: 24)
-            }
-            .buttonStyle(.plain)
-            
-            Spacer()
+
+    var titleBlock: some View {
+        VStack(spacing: DesignSpacing.sm) {
+            Text("BODY FIT")
+                .font(.system(size: 44, weight: .black, design: .rounded))
+                .foregroundStyle(DesignColor.ink)
+
+            Text("에어팟만 끼면 준비 끝")
+                .font(DesignFont.headline)
+                .foregroundStyle(DesignColor.brand.deep)
         }
+        .multilineTextAlignment(.center)
     }
-    
-    var centerContent: some View {
-        VStack(spacing: 16) {
-            Text("BODY\nFIT")
-                .font(.system(size: 72, weight: .heavy))
-                .foregroundStyle(DesignColor.slateLight)
-                .multilineTextAlignment(.center)
-                .lineSpacing(-8)
-                .tracking(-1.6)
-            
-            Text("당신의 한계를 뛰어넘으세요")
-                .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(DesignColor.brandOrange)
-        }
-        .frame(maxWidth: .infinity)
-    }
-    
+
     var loginButtons: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: DesignSpacing.md) {
             Button {
                 viewModel.loginWithKakao()
             } label: {
-                HStack(spacing: 16) {
+                HStack(spacing: DesignSpacing.sm) {
                     if viewModel.isLoading {
                         ProgressView()
-                            .tint(DesignColor.kakaoText)
+                            .tint(DesignColor.kakaoLabel)
                     } else {
-                        Image(systemName: "bubble.left")
-                            .font(.system(size: 21, weight: .medium))
+                        Image(systemName: "bubble.left.fill")
                     }
-
                     Text("Kakao로 로그인")
-                        .font(.system(size: 18, weight: .bold))
                 }
-                .foregroundStyle(DesignColor.kakaoText)
-                .frame(maxWidth: .infinity)
-                .frame(height: 64)
-                .background(DesignColor.kakaoYellow)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DSButtonStyle(palette: DesignColor.kakao, foreground: DesignColor.kakaoLabel))
             .disabled(viewModel.isLoading)
 
             Button {
                 viewModel.loginWithApple()
             } label: {
-                HStack(spacing: 16) {
+                HStack(spacing: DesignSpacing.sm) {
                     if viewModel.isLoading {
                         ProgressView()
                             .tint(DesignColor.white)
                     } else {
                         Image(systemName: "applelogo")
-                            .font(.system(size: 18, weight: .semibold))
                     }
-
                     Text("Apple로 로그인")
-                        .font(.system(size: 18, weight: .bold))
-                }
-                .foregroundStyle(DesignColor.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 64)
-                .background(DesignColor.black)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(DesignColor.blackButtonBorder, lineWidth: 1)
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DSButtonStyle(palette: DesignColor.apple))
             .disabled(viewModel.isLoading)
         }
         .alert("오류", isPresented: .constant(viewModel.errorMessage != nil)) {
@@ -136,34 +102,40 @@ private extension LoginView {
             }
         }
     }
-    
+
     @ViewBuilder
     var loginStatus: some View {
         if viewModel.isLoggedIn {
-            VStack(spacing: 4) {
+            VStack(spacing: 2) {
                 Text("로그인 성공")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(DesignColor.brandOrange)
+                    .font(DesignFont.label)
+                    .foregroundStyle(DesignColor.success.deep)
+
                 if let name = viewModel.loggedInUserName, !name.isEmpty {
                     Text(name)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(DesignColor.slate300)
+                        .font(DesignFont.caption)
+                        .foregroundStyle(DesignColor.inkMuted)
                 }
                 if let email = viewModel.loggedInUserEmail, !email.isEmpty {
                     Text(email)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(DesignColor.slate400)
+                        .font(DesignFont.caption)
+                        .foregroundStyle(DesignColor.inkMuted)
                 }
             }
             .frame(maxWidth: .infinity)
+            .padding(.top, DesignSpacing.md)
         }
     }
 
     var termsText: some View {
         Text("로그인 시 BodyFit의 이용약관 및 개인정보처리방침에 동의합니다.")
-            .font(.system(size: 12, weight: .regular))
-            .foregroundStyle(DesignColor.slate600)
+            .font(DesignFont.caption)
+            .foregroundStyle(DesignColor.inkMuted)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
     }
+}
+
+#Preview {
+    LoginView()
 }

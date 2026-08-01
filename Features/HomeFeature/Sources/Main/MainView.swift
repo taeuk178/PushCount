@@ -2,6 +2,7 @@ import SwiftUI
 
 import HomeFeatureInterface
 import DesignSystemKit
+import CharacterKit
 import MotionKit
 
 public struct HomeView: View {
@@ -9,8 +10,8 @@ public struct HomeView: View {
     public init() {}
 
     @State private var showingActionView = false
-    @State private var todayPushCount = 0
-    @State private var selectedExerciseIndex = 0
+    @State private var todayCount = 0
+    @State private var selectedExerciseID = Exercise.pushUp.id
     @State private var airPodsMonitor = AirPodsMotionMonitor()
     @State private var showingAirPodsAlert = false
     @AppStorage("outdoorWorkoutRecommendationEnabled") private var outdoorWorkoutRecommendationEnabled = false
@@ -18,101 +19,46 @@ public struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
-    private let exercises: [ExerciseCard] = [
-        ExerciseCard(
-            titleTop: "PUSH",
-            titleBottom: "UPS",
-            subtitle: "가슴 • 삼두 • 코어",
-            intensity: "고강도",
-            duration: "10분",
-            colors: [DesignColor.homeCardPush, DesignColor.black]
-        ),
-        ExerciseCard(
-            titleTop: "PULL",
-            titleBottom: "UPS",
-            subtitle: "등 • 이두 • 코어",
-            intensity: "중강도",
-            duration: "12분",
-            colors: [DesignColor.homeCardPull, DesignColor.black]
-        ),
-        ExerciseCard(
-            titleTop: "SQUAT",
-            titleBottom: "SET",
-            subtitle: "하체 • 둔근 • 코어",
-            intensity: "고강도",
-            duration: "15분",
-            colors: [DesignColor.homeCardSquat, DesignColor.black]
-        )
-    ]
-    
+    private var selectedExercise: Exercise {
+        Exercise.all.first { $0.id == selectedExerciseID } ?? .pushUp
+    }
+
     public var body: some View {
-        ZStack(alignment: .bottom) {
-            DesignColor.black
+        ZStack {
+            DesignColor.canvas
                 .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 32) {
-                Text("오늘의 운동 시작해볼까요?")
-                    .font(.system(size: 32, weight: .heavy))
-                    .foregroundStyle(DesignColor.white)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 12)
 
-                VStack(spacing: 10) {
-                    AirPodsStatusBanner(state: airPodsMonitor.state) {
-                        openAppSettings()
-                    }
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: DesignSpacing.lg) {
+                    greeting
 
-                    if outdoorWorkoutRecommendationEnabled {
-                        nearParkBanner
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, -10)
-                
-                VStack(alignment: .leading, spacing: 20) {
-                    TabView(selection: $selectedExerciseIndex) {
-                        ForEach(Array(exercises.enumerated()), id: \.offset) { index, exercise in
-                            ExerciseCardView(exercise: exercise)
-                                .padding(.horizontal, 24)
-                                .tag(index)
+                    characterStage
+
+                    exercisePicker
+
+                    VStack(spacing: DesignSpacing.sm) {
+                        AirPodsStatusBanner(state: airPodsMonitor.state) {
+                            openAppSettings()
+                        }
+
+                        if outdoorWorkoutRecommendationEnabled {
+                            nearParkBanner
                         }
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .automatic))
-                    .frame(height: UIScreen.main.bounds.height / 2)
-                    
-                    VStack(spacing: 12) {
-                        Text("선택된 운동: \(exercises[selectedExerciseIndex].displayName)")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(DesignColor.brandOrangeSoft)
-                        
-                        Button {
-                            startWorkout()
-                        } label: {
-                            HStack(spacing: 8) {
-                                Text("시작하기")
-                                Image(systemName: "play.fill")
-                                    .font(.system(size: 15, weight: .bold))
-                            }
-                            .frame(width: 210, height: 64)
-                            .font(.system(size: 28, weight: .heavy))
-                            .foregroundStyle(DesignColor.white)
-                            .background(DesignColor.brandOrange)
-                            .clipShape(Capsule())
-                            .shadow(color: DesignColor.brandOrange.opacity(0.45), radius: 16)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    
-                    Spacer()
+
+                    startButton
                 }
+                .padding(.horizontal, DesignSpacing.screen)
+                .padding(.top, DesignSpacing.sm)
+                .padding(.bottom, DesignSpacing.xl)
             }
         }
         .fullScreenCover(isPresented: $showingActionView) {
             ActionView(
-                exerciseTitle: exercises[selectedExerciseIndex].displayName,
+                exercise: selectedExercise,
                 motionMonitor: airPodsMonitor
-            ) { completedPushCount in
-                todayPushCount += completedPushCount
+            ) { completedCount in
+                todayCount += completedCount
             }
         }
         .task {
@@ -151,104 +97,138 @@ public struct HomeView: View {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         openURL(url)
     }
+}
 
-    private var nearParkBanner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "location.fill")
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(DesignColor.brandOrange)
-                .frame(width: 28, height: 28)
-                .background(DesignColor.settingIconOverlay)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+// MARK: - 구성 요소
 
-            Text("가까운 공원이 250m 거리에 있습니다")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(DesignColor.white)
+private extension HomeView {
+
+    var greeting: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: DesignSpacing.xs) {
+                Text("오늘도 가볍게")
+                    .font(DesignFont.display)
+                    .foregroundStyle(DesignColor.ink)
+
+                Text(todayCount > 0 ? "지금까지 \(todayCount)회 했어요" : "딱 한 세트만 해볼까요?")
+                    .font(DesignFont.body)
+                    .foregroundStyle(DesignColor.inkMuted)
+            }
+
+            Spacer(minLength: 0)
+
+            if todayCount > 0 {
+                DSPill("오늘 \(todayCount)회", systemImage: "flame.fill", palette: DesignColor.sunny)
+                    .padding(.top, DesignSpacing.xs)
+            }
+        }
+    }
+
+    /// 캐릭터가 앉아 있는 무대. 화면에서 가장 큰 자리를 차지한다.
+    var characterStage: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: DesignRadius.xl, style: .continuous)
+                .fill(selectedExercise.palette.soft)
+
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+
+                PushUpCharacterView(
+                    phase: 0.7,
+                    mood: .resting,
+                    palette: selectedExercise.palette,
+                    scale: 1.05
+                )
+
+                Text(selectedExercise.cheer)
+                    .font(DesignFont.headline)
+                    .foregroundStyle(selectedExercise.palette.deep)
+                    .padding(.bottom, DesignSpacing.md)
+            }
+        }
+        .frame(height: 250)
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedExerciseID)
+    }
+
+    var exercisePicker: some View {
+        HStack(spacing: DesignSpacing.sm) {
+            ForEach(Exercise.all) { exercise in
+                exerciseChip(exercise)
+            }
+        }
+    }
+
+    func exerciseChip(_ exercise: Exercise) -> some View {
+        let isSelected = exercise.id == selectedExerciseID
+        let palette = exercise.isAvailable ? exercise.palette : DesignColor.muted
+
+        return Button {
+            guard exercise.isAvailable else { return }
+            selectedExerciseID = exercise.id
+        } label: {
+            VStack(spacing: DesignSpacing.xs) {
+                Image(systemName: exercise.isAvailable ? exercise.icon : "lock.fill")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+
+                Text(exercise.name)
+                    .font(DesignFont.label)
+
+                Text(exercise.isAvailable ? exercise.detail : "준비 중")
+                    .font(DesignFont.caption)
+                    .opacity(0.7)
+            }
+            .foregroundStyle(isSelected ? DesignColor.white : palette.deep)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, DesignSpacing.md)
+            .background {
+                RoundedRectangle(cornerRadius: DesignRadius.md, style: .continuous)
+                    .fill(isSelected ? palette.main : palette.soft)
+            }
+        }
+        .buttonStyle(.plain)
+        .opacity(exercise.isAvailable ? 1 : 0.55)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isSelected)
+    }
+
+    var startButton: some View {
+        Button {
+            startWorkout()
+        } label: {
+            HStack(spacing: DesignSpacing.sm) {
+                Image(systemName: "play.fill")
+                Text("시작하기")
+            }
+        }
+        .buttonStyle(DSButtonStyle(palette: selectedExercise.palette, height: 60))
+        .padding(.top, DesignSpacing.xs)
+    }
+
+    var nearParkBanner: some View {
+        HStack(spacing: DesignSpacing.sm) {
+            Image(systemName: "tree.fill")
+                .font(DesignFont.label)
+                .foregroundStyle(DesignColor.success.deep)
+                .frame(width: 32, height: 32)
+                .background(DesignColor.success.soft, in: Circle())
+
+            Text("가까운 공원이 250m 거리에 있어요")
+                .font(DesignFont.body)
+                .foregroundStyle(DesignColor.ink)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
-            Spacer()
+            Spacer(minLength: 0)
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(DesignColor.white.opacity(0.75))
+                .font(DesignFont.caption)
+                .foregroundStyle(DesignColor.inkMuted)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(DesignColor.settingCardOverlay)
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(DesignColor.white.opacity(0.15), lineWidth: 1)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .padding(DesignSpacing.sm)
+        .background(DesignColor.surface, in: RoundedRectangle(cornerRadius: DesignRadius.md, style: .continuous))
+        .shadow(color: DesignColor.ink.opacity(0.05), radius: 8, y: 2)
     }
 }
 
-private struct ExerciseCardView: View {
-    
-    let exercise: ExerciseCard
-    
-    var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 26)
-                .fill(
-                    LinearGradient(
-                        colors: exercise.colors,
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 26)
-                        .stroke(DesignColor.brandOrange.opacity(0.6), lineWidth: 1)
-                }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text(exercise.titleTop)
-                    .font(.system(size: 56, weight: .black))
-                    .foregroundStyle(DesignColor.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                
-                Text(exercise.titleBottom)
-                    .font(.system(size: 56, weight: .black))
-                    .foregroundStyle(DesignColor.brandOrange)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(exercise.subtitle)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(DesignColor.slate300)
-                    
-                    HStack(spacing: 12) {
-                        Label(exercise.intensity, systemImage: "flame.fill")
-                            .foregroundStyle(DesignColor.brandOrange)
-                        Label(exercise.duration, systemImage: "timer")
-                            .foregroundStyle(DesignColor.brandOrange)
-                    }
-                    .font(.system(size: 14, weight: .semibold))
-                }
-            }
-            .padding(24)
-        }
-    }
-}
-
-private struct ExerciseCard {
-    let titleTop: String
-    let titleBottom: String
-    let subtitle: String
-    let intensity: String
-    let duration: String
-    let colors: [Color]
-    
-    var displayName: String {
-        "\(titleTop) \(titleBottom)"
-    }
-}
-
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-    }
+#Preview {
+    HomeView()
 }

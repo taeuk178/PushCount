@@ -34,6 +34,10 @@ let project = Project(
                 .project(
                     target: "MotionKit",
                     path: .relativeToRoot("Modules/MotionKit")
+                ),
+                .project(
+                    target: "CharacterKit",
+                    path: .relativeToRoot("Modules/CharacterKit")
                 )
             ]
         ),

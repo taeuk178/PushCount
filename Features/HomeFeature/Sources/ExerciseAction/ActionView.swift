@@ -8,19 +8,21 @@
 import SwiftUI
 import HomeFeatureInterface
 import DesignSystemKit
+import CharacterKit
 import MotionKit
 
+/// 운동 중 화면.
+///
+/// 사용자는 바닥에 엎드려 있어 숫자를 읽을 수 없다. 그래서 이 화면은
+/// 캐릭터 · 햅틱만 남기고 나머지를 덜어냈다. 캐릭터가 내 동작을 그대로
+/// 따라 움직이는 것이 "지금 세어지고 있다"는 가장 확실한 신호다.
 struct ActionView: View {
-
-    /// 파형에 남겨둘 샘플 수. 12Hz 기준 약 4초 분량.
-    private static let historyCapacity = 48
 
     @State private var manualCount: Int = 0
     @State private var elapsedSeconds: Int = 0
     @State private var isPaused = false
     @State private var isLocked = false
     @State private var showResultView = false
-    @State private var accelerationHistory: [Double] = []
     @State private var counter = PushUpCounter()
 
     /// 카운트 햅틱. 매번 새로 만들면 첫 사용 때 Taptic Engine 초기화로
@@ -30,8 +32,9 @@ struct ActionView: View {
     /// 에어팟이 감지한 횟수 + 탭으로 보정한 횟수.
     private var pushCount: Int { counter.repCount + manualCount }
 
-    private let targetCount = 50
-    let exerciseTitle: String
+    private var didReachGoal: Bool { pushCount >= exercise.targetCount }
+
+    let exercise: Exercise
     let motionMonitor: AirPodsMotionMonitor
     let onComplete: (Int) -> Void
 
@@ -39,46 +42,30 @@ struct ActionView: View {
     @Environment(\.dismiss) private var dismiss
 
     init(
-        exerciseTitle: String = "PUSH UPS",
+        exercise: Exercise = .pushUp,
         motionMonitor: AirPodsMotionMonitor,
         onComplete: @escaping (Int) -> Void
     ) {
-        self.exerciseTitle = exerciseTitle
+        self.exercise = exercise
         self.motionMonitor = motionMonitor
         self.onComplete = onComplete
     }
-    
+
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [DesignColor.black, DesignColor.deepOrangeBackground, DesignColor.black],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            Circle()
-                .fill(DesignColor.brandOrange.opacity(0.20))
-                .frame(width: 520, height: 520)
-                .blur(radius: 60)
-                .offset(y: 100)
-            
+            exercise.palette.soft
+                .ignoresSafeArea()
+
             VStack(spacing: 0) {
-                headerView
-                    .padding(.top, 20)
-                    .padding(.horizontal, 24)
-                
-                mainCounterArea
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        guard !isPaused, !isLocked else { return }
-                        manualCount += 1
-                    }
-                
-                footerView
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 26)
-                    .padding(.top, 14)
+                header
+                    .padding(.horizontal, DesignSpacing.screen)
+                    .padding(.top, DesignSpacing.sm)
+
+                stage
+
+                footer
+                    .padding(.horizontal, DesignSpacing.screen)
+                    .padding(.bottom, DesignSpacing.lg)
             }
         }
         .onReceive(timer) { _ in
@@ -88,7 +75,6 @@ struct ActionView: View {
         .task {
             // HomeView 가 이미 시작한 경우 내부에서 무시된다. 운동 화면만
             // 단독으로 띄우는 경로에서도 모션이 흐르도록 보장하는 용도.
-            print("[PUSHUP] 운동 시작 — \(exerciseTitle), 에어팟 상태: \(motionMonitor.state.title)")
             motionMonitor.start()
             counter.reset()
             counter.attach(to: motionMonitor)
@@ -96,218 +82,164 @@ struct ActionView: View {
         }
         .onDisappear {
             counter.detach()
-            print("[PUSHUP] 운동 화면 종료 — 자동 \(counter.repCount)회 + 수동 \(manualCount)회 = \(pushCount)회")
         }
         .onChange(of: isPaused) { _, paused in
             counter.isPaused = paused
         }
         .onChange(of: counter.repCount) { _, _ in
-            hapticGenerator.impactOccurred()
-            // 다음 카운트를 위해 엔진을 계속 예열 상태로 유지한다.
-            hapticGenerator.prepare()
-        }
-        .onChange(of: motionMonitor.latestSample) { _, sample in
-            guard !isPaused, let sample else { return }
-            appendToHistory(sample.verticalAcceleration)
+            playCountFeedback()
         }
         .fullScreenCover(isPresented: $showResultView) {
-            ResultView(pushCount: pushCount) { completedCount in
+            ResultView(
+                exercise: exercise,
+                pushCount: pushCount,
+                elapsedSeconds: elapsedSeconds
+            ) { completedCount in
                 showResultView = false
                 onComplete(completedCount)
                 dismiss()
             }
         }
     }
+
+    private func playCountFeedback() {
+        hapticGenerator.impactOccurred()
+        // 다음 카운트를 위해 엔진을 계속 예열 상태로 유지한다.
+        hapticGenerator.prepare()
+    }
 }
 
+// MARK: - 구성 요소
+
 private extension ActionView {
-    var headerView: some View {
-        HStack {
-            circleIconButton(systemName: "xmark") {
-                showResultView = true
-            }
-            
-            Spacer()
-            
-            VStack(spacing: 4) {
-                Text(exerciseTitle)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(DesignColor.brandOrange)
-                
-                Text("목표: \(targetCount) 회")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(DesignColor.white.opacity(0.65))
-            }
-            
-            Spacer()
-            
-            circleIconButton(systemName: "gearshape.fill") {
-            }
-            .opacity(0.9)
-        }
-    }
-    
-    var mainCounterArea: some View {
-        VStack(spacing: 26) {
-            Text(counter.isTracking ? "자동으로 세는 중 · 탭하면 보정" : "탭해서 횟수 올리기")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(DesignColor.white.opacity(0.85))
-                .padding(.horizontal, 18)
-                .padding(.vertical, 10)
-                .background(DesignColor.white.opacity(0.08))
-                .clipShape(Capsule())
-                .padding(.top, 36)
-            
-            ZStack {
-                Circle()
-                    .stroke(DesignColor.brandOrange.opacity(0.22), lineWidth: 1)
-                    .frame(width: 250, height: 250)
-                
-                Circle()
-                    .stroke(DesignColor.brandOrange.opacity(0.10), lineWidth: 1)
-                    .frame(width: 320, height: 320)
-                
-                VStack(spacing: 6) {
-                    Text("\(pushCount)")
-                        .font(.system(size: 132, weight: .heavy))
-                        .foregroundStyle(DesignColor.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                    
-                    Text("회 완료")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(DesignColor.brandOrange)
-                }
-            }
-            .padding(.top, 16)
-            .padding(.bottom, 26)
-            
-            HStack(spacing: 48) {
-                statBlock(title: "시간", value: formattedTime)
-                statBlock(title: "평균 페이스", value: "\(formattedPace) 초")
-            }
-            .padding(.top, 8)
 
-            MotionReadoutView(
-                state: motionMonitor.state,
-                sample: motionMonitor.latestSample,
-                history: accelerationHistory,
-                phase: counter.phase,
-                isTracking: counter.isTracking,
-                isPostureValid: counter.isPostureValid,
-                autoCount: counter.repCount
-            )
-            .padding(.horizontal, 24)
-            .padding(.top, 18)
-
-            Spacer(minLength: 0)
-        }
+    /// 캐릭터의 표정. 자세가 어긋나면 표정으로만 알린다.
+    var mood: CharacterMood {
+        if didReachGoal { return .cheering }
+        if isPaused { return .resting }
+        if !counter.isTracking { return .resting }
+        return counter.isPostureValid ? .working : .confused
     }
-    
-    var footerView: some View {
-        VStack(spacing: 24) {
-            HStack(spacing: 28) {
-                smallActionButton(systemName: "stop.fill", title: "완료") {
+
+    var header: some View {
+        VStack(spacing: DesignSpacing.sm) {
+            HStack {
+                DSIconButton(systemName: "xmark", palette: exercise.palette) {
                     showResultView = true
                 }
-                
-                Button {
-                    isPaused.toggle()
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(DesignColor.brandOrange)
-                            .frame(width: 94, height: 94)
-                            .shadow(color: DesignColor.brandOrange.opacity(0.4), radius: 16)
-                        
-                        Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 30, weight: .bold))
-                            .foregroundStyle(DesignColor.white)
-                    }
-                }
-                .buttonStyle(.plain)
-                
-                smallActionButton(systemName: isLocked ? "lock.fill" : "lock.open.fill", title: "잠금") {
+
+                Spacer()
+
+                Text(exercise.name)
+                    .font(DesignFont.headline)
+                    .foregroundStyle(exercise.palette.deep)
+
+                Spacer()
+
+                DSIconButton(
+                    systemName: isLocked ? "lock.fill" : "lock.open.fill",
+                    palette: isLocked ? DesignColor.sunny : exercise.palette
+                ) {
                     isLocked.toggle()
                 }
             }
-        }
-    }
-    
-    func statBlock(title: String, value: String) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(DesignColor.white.opacity(0.45))
-            
-            Text(value)
-                .font(.system(size: 40, weight: .heavy))
-                .foregroundStyle(DesignColor.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-    }
-    
-    func circleIconButton(systemName: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Circle()
-                .fill(DesignColor.white.opacity(0.10))
-                .frame(width: 40, height: 40)
-                .overlay {
-                    Image(systemName: systemName)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(DesignColor.white.opacity(0.88))
-                }
-        }
-        .buttonStyle(.plain)
-    }
-    
-    func smallActionButton(systemName: String, title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                Circle()
-                    .fill(DesignColor.white.opacity(0.08))
-                    .frame(width: 48, height: 48)
-                    .overlay {
-                        Circle()
-                            .stroke(DesignColor.white.opacity(0.18), lineWidth: 2)
-                    }
-                    .overlay {
-                        Image(systemName: systemName)
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(DesignColor.white.opacity(0.88))
-                    }
-                
-                Text(title)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(DesignColor.white.opacity(0.55))
+
+            HStack(spacing: DesignSpacing.sm) {
+                DSProgressBar(
+                    progress: Double(pushCount) / Double(exercise.targetCount),
+                    palette: exercise.palette
+                )
+
+                Text("\(pushCount)/\(exercise.targetCount)")
+                    .font(DesignFont.numeric(14))
+                    .foregroundStyle(exercise.palette.deep)
             }
         }
-        .buttonStyle(.plain)
     }
-    
-    func appendToHistory(_ value: Double) {
-        accelerationHistory.append(value)
-        if accelerationHistory.count > ActionView.historyCapacity {
-            accelerationHistory.removeFirst(accelerationHistory.count - ActionView.historyCapacity)
+
+    /// 캐릭터와 숫자. 이 영역 어디를 눌러도 한 번 보정된다.
+    var stage: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+
+            PushUpCharacterView(
+                phase: counter.phase,
+                mood: mood,
+                palette: exercise.palette,
+                scale: 1.35
+            )
+
+            HStack(alignment: .lastTextBaseline, spacing: DesignSpacing.xs) {
+                Text("\(pushCount)")
+                    .font(DesignFont.counter(96))
+                    .foregroundStyle(DesignColor.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .contentTransition(.numericText())
+
+                Text("회")
+                    .font(DesignFont.title)
+                    .foregroundStyle(DesignColor.inkMuted)
+            }
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: pushCount)
+
+            Text(hintText)
+                .font(DesignFont.label)
+                .foregroundStyle(DesignColor.inkMuted)
+                .padding(.top, DesignSpacing.xs)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard !isPaused, !isLocked else { return }
+            manualCount += 1
+            playCountFeedback()
+        }
+    }
+
+    var hintText: String {
+        if isLocked { return "화면이 잠겨 있어요" }
+        if isPaused { return "잠시 쉬는 중" }
+        if counter.isTracking { return "자동으로 세는 중 · 탭하면 보정" }
+        return "화면을 탭해서 세기"
+    }
+
+    var footer: some View {
+        VStack(spacing: DesignSpacing.md) {
+            HStack(spacing: 0) {
+                DSStat(value: formattedTime, label: "시간", size: 22)
+                DSStat(value: "\(formattedPace)초", label: "평균 페이스", size: 22)
+            }
+
+            Button {
+                isPaused.toggle()
+            } label: {
+                HStack(spacing: DesignSpacing.sm) {
+                    Image(systemName: isPaused ? "play.fill" : "pause.fill")
+                    Text(isPaused ? "이어서 하기" : "일시정지")
+                }
+            }
+            .buttonStyle(
+                DSButtonStyle(
+                    palette: isPaused ? DesignColor.success : exercise.palette,
+                    height: 56
+                )
+            )
         }
     }
 
     var formattedTime: String {
-        let minutes = elapsedSeconds / 60
-        let seconds = elapsedSeconds % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        String(format: "%02d:%02d", elapsedSeconds / 60, elapsedSeconds % 60)
     }
-    
+
     var formattedPace: String {
         guard pushCount > 0 else { return "0.0" }
-        let pace = Double(elapsedSeconds) / Double(pushCount)
-        return String(format: "%.1f", pace)
+        return String(format: "%.1f", Double(elapsedSeconds) / Double(pushCount))
     }
 }
 
 #Preview {
-    ActionView(motionMonitor: AirPodsMotionMonitor()) { count in
-        print("Completed push count: \(count)")
-    }
+    ActionView(motionMonitor: AirPodsMotionMonitor()) { _ in }
 }

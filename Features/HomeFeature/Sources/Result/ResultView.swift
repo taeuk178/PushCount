@@ -8,219 +8,173 @@
 import SwiftUI
 import HomeFeatureInterface
 import DesignSystemKit
+import CharacterKit
 
+/// 운동 결과 요약.
+///
+/// 지표는 실제로 측정한 값만 크게 보여준다. 칼로리처럼 추정치는 "약" 을 붙여
+/// 위계를 낮춘다. 실측과 추정이 같은 크기로 나란히 있으면 기록 전체가
+/// 덜 믿음직해진다.
 struct ResultView: View {
-    
+
+    let exercise: Exercise
     let pushCount: Int
+    let elapsedSeconds: Int
     let onDismiss: (Int) -> Void
-    
+
+    @State private var appeared = false
+
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [DesignColor.black, DesignColor.deepOrangeBackgroundStrong, DesignColor.black],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            Circle()
-                .fill(DesignColor.brandOrange.opacity(0.16))
-                .frame(width: 360, height: 360)
-                .blur(radius: 40)
-                .offset(x: 110, y: 190)
-            
-            Circle()
-                .fill(DesignColor.brandOrange.opacity(0.08))
-                .frame(width: 260, height: 260)
-                .blur(radius: 30)
-                .offset(x: -120, y: -170)
-            
+            DesignColor.canvas
+                .ignoresSafeArea()
+
             VStack(spacing: 0) {
-                headerView
-                
-                Spacer()
-                
-                centerSummaryView
-                
-                metricsGrid
-                    .padding(.top, 30)
-                
-                Spacer()
-                
-                footerView
-                    .padding(.bottom, 28)
+                header
+
+                Spacer(minLength: 0)
+
+                PushUpCharacterView(
+                    phase: 1,
+                    mood: .cheering,
+                    palette: exercise.palette,
+                    scale: 1.15
+                )
+
+                summary
+
+                Spacer(minLength: 0)
+
+                metrics
+
+                Spacer(minLength: 0)
+
+                footer
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 48)
+            .padding(.horizontal, DesignSpacing.screen)
+            .padding(.top, DesignSpacing.md)
+            .padding(.bottom, DesignSpacing.lg)
+        }
+        .task {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1)) {
+                appeared = true
+            }
         }
     }
 }
 
+// MARK: - 구성 요소
+
 private extension ResultView {
-    var headerView: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("운동 결과 요약")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(DesignColor.brandOrange)
-                    .tracking(1.2)
-                
-                Text("수고하셨습니다!")
-                    .font(.system(size: 26, weight: .heavy))
-                    .foregroundStyle(DesignColor.white)
-                
-                Text("\(formatDateInKorean(Date())) • 맨몸 운동")
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(DesignColor.slate400)
+
+    var header: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("수고했어요!")
+                    .font(DesignFont.display)
+                    .foregroundStyle(DesignColor.ink)
+
+                Text("\(formattedDate) · \(exercise.name)")
+                    .font(DesignFont.body)
+                    .foregroundStyle(DesignColor.inkMuted)
             }
-            
+
             Spacer()
-            
+
+            DSIconButton(systemName: "xmark", palette: DesignColor.muted) {
+                onDismiss(pushCount)
+            }
+        }
+    }
+
+    var summary: some View {
+        VStack(spacing: DesignSpacing.xs) {
+            Text("\(pushCount)")
+                .font(DesignFont.counter(88))
+                .foregroundStyle(exercise.palette.main)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+
+            Text("총 횟수")
+                .font(DesignFont.headline)
+                .foregroundStyle(DesignColor.inkMuted)
+        }
+        .scaleEffect(appeared ? 1 : 0.7)
+        .opacity(appeared ? 1 : 0)
+    }
+
+    var metrics: some View {
+        DSCard(padding: DesignSpacing.md) {
+            HStack(spacing: 0) {
+                DSStat(value: formattedDuration, label: "운동 시간")
+
+                divider
+
+                DSStat(value: formattedPerMinute, label: "분당 횟수")
+
+                divider
+
+                DSStat(value: "약 \(estimatedCalories)", label: "칼로리")
+            }
+        }
+    }
+
+    var divider: some View {
+        Rectangle()
+            .fill(DesignColor.line)
+            .frame(width: 1, height: 32)
+    }
+
+    var footer: some View {
+        VStack(spacing: DesignSpacing.sm) {
             Button {
                 onDismiss(pushCount)
             } label: {
-                Circle()
-                    .fill(DesignColor.white.opacity(0.10))
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(DesignColor.white.opacity(0.9))
-                    }
+                Text("완료")
             }
-            .buttonStyle(.plain)
-        }
-    }
-    
-    var centerSummaryView: some View {
-        VStack(spacing: 8) {
-            Text("\(pushCount)")
-                .font(.system(size: 120, weight: .black))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [DesignColor.brandOrangeGradientStart, DesignColor.brandOrangeGradientEnd],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            
-            Text("총 횟수 (푸시업)")
-                .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(DesignColor.slate400)
-                .tracking(0.6)
-        }
-    }
-    
-    var metricsGrid: some View {
-        let duration = workoutDurationString()
-        let calories = calculateCalories(pushCount: pushCount)
-        let pace = calculatePerMinute(pushCount: pushCount, durationString: duration)
-        let heartRate = estimatedHeartRate(pushCount: pushCount)
-        
-        return VStack(spacing: 24) {
-            HStack(spacing: 24) {
-                metricItem(value: duration, label: "운동 시간")
-                metricItem(value: "\(calories)", label: "소모 칼로리")
-            }
-            
-            HStack(spacing: 24) {
-                metricItem(value: String(format: "%.1f", pace), label: "분당 횟수")
-                metricItem(value: "\(heartRate)", label: "평균 심박수")
-            }
-        }
-    }
-    
-    func metricItem(value: String, label: String) -> some View {
-        VStack(spacing: 4) {
-            Text(value)
-                .font(.system(size: 34, weight: .heavy))
-                .foregroundStyle(DesignColor.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            
-            Text(label)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(DesignColor.slate500)
-        }
-        .frame(maxWidth: .infinity)
-    }
-    
-    var footerView: some View {
-        VStack(spacing: 14) {
+            .buttonStyle(DSButtonStyle(palette: exercise.palette, height: 58))
+
             Button {
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: DesignSpacing.sm) {
                     Image(systemName: "square.and.arrow.up")
                     Text("친구에게 공유하기")
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 58)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(DesignColor.white)
-                .background(DesignColor.clear)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(DesignColor.white.opacity(0.18), lineWidth: 1)
-                }
             }
-            .buttonStyle(.plain)
-            
-            Button {
-                onDismiss(pushCount)
-            } label: {
-                HStack(spacing: 8) {
-                    Text("완료")
-                    Image(systemName: "chevron.right")
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 66)
-                .font(.system(size: 22, weight: .black))
-                .foregroundStyle(DesignColor.black.opacity(0.85))
-                .background(DesignColor.brandOrange)
-                .clipShape(Capsule())
-                .shadow(color: DesignColor.brandOrange.opacity(0.35), radius: 16)
-            }
+            .buttonStyle(DSQuietButtonStyle())
         }
     }
 }
 
-extension ResultView {
-    
-    private func formatDateInKorean(_ date: Date) -> String {
+// MARK: - 값 계산
+
+private extension ResultView {
+
+    var formattedDate: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "M월 d일 EEEE"
-        return formatter.string(from: date)
+        return formatter.string(from: Date())
     }
-    
-    private func calculateCalories(pushCount: Int) -> Int {
-        let caloriesPerPushUp = 0.32
-        return max(Int(Double(pushCount) * caloriesPerPushUp), 1)
+
+    /// 실제로 측정한 시간.
+    var formattedDuration: String {
+        String(format: "%02d:%02d", elapsedSeconds / 60, elapsedSeconds % 60)
     }
-    
-    private func workoutDurationString() -> String {
-        let seconds = max(pushCount * 3, 60)
-        let minutesPart = seconds / 60
-        let secondsPart = seconds % 60
-        return String(format: "%02d:%02d", minutesPart, secondsPart)
+
+    /// 실측 횟수와 실측 시간으로 계산한 값.
+    var formattedPerMinute: String {
+        guard elapsedSeconds > 0 else { return "0.0" }
+        let perMinute = Double(pushCount) / (Double(elapsedSeconds) / 60)
+        return String(format: "%.1f", perMinute)
     }
-    
-    private func calculatePerMinute(pushCount: Int, durationString: String) -> Double {
-        let parts = durationString.split(separator: ":")
-        guard parts.count == 2,
-              let minutes = Double(parts[0]),
-              let seconds = Double(parts[1]) else { return 0 }
-        let totalMinutes = max((minutes * 60 + seconds) / 60, 0.1)
-        return Double(pushCount) / totalMinutes
-    }
-    
-    private func estimatedHeartRate(pushCount: Int) -> Int {
-        min(110 + Int(Double(pushCount) * 0.7), 185)
+
+    /// 횟수 기반 추정치. 측정한 값이 아니라서 "약" 을 붙여 보여준다.
+    var estimatedCalories: Int {
+        max(Int(Double(pushCount) * 0.32), 1)
     }
 }
 
 #Preview {
-    ResultView(pushCount: 37) { _ in }
+    ResultView(exercise: .pushUp, pushCount: 37, elapsedSeconds: 214) { _ in }
 }

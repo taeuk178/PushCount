@@ -4,128 +4,117 @@ import RecordFeatureInterface
 import DesignSystemKit
 
 public struct RecordView: View {
-    
+
+    // TODO: 데이터 영속화 후 실제 기록으로 교체
     private let records: [WorkoutRecord] = [
         .init(date: "10월 24일 목요일", title: "푸시업", reps: 50, duration: "12:45", calories: 16),
         .init(date: "10월 23일 수요일", title: "푸시업", reps: 37, duration: "09:18", calories: 12),
         .init(date: "10월 22일 화요일", title: "푸시업", reps: 41, duration: "10:26", calories: 13),
         .init(date: "10월 21일 월요일", title: "푸시업", reps: 29, duration: "07:42", calories: 9)
     ]
-    
+
     public var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 24) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("활동 기록")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(DesignColor.brandOrange)
-                        .tracking(1.2)
-                    
-                    Text("히스토리")
-                        .font(.system(size: 32, weight: .heavy))
-                        .foregroundStyle(DesignColor.white)
-                    
-                    Text("최근 운동 결과를 한눈에 확인하세요")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(DesignColor.slate400)
-                }
-                
-                HStack(spacing: 12) {
-                    summaryCard(title: "총 운동", value: "\(records.count)회")
-                    summaryCard(title: "총 횟수", value: "\(records.map(\.reps).reduce(0, +))회")
-                    summaryCard(title: "칼로리", value: "\(records.map(\.calories).reduce(0, +))kcal")
-                }
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("기록 목록")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(DesignColor.white)
-                    
-                    ForEach(records) { record in
-                        historyCard(record: record)
+        ZStack {
+            DesignColor.canvas
+                .ignoresSafeArea()
+
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: DesignSpacing.lg) {
+                    VStack(alignment: .leading, spacing: DesignSpacing.xs) {
+                        Text("기록")
+                            .font(DesignFont.display)
+                            .foregroundStyle(DesignColor.ink)
+
+                        Text("지금까지 \(totalReps)회 해냈어요")
+                            .font(DesignFont.body)
+                            .foregroundStyle(DesignColor.inkMuted)
+                    }
+
+                    summary
+
+                    VStack(alignment: .leading, spacing: DesignSpacing.sm) {
+                        Text("최근 운동")
+                            .font(DesignFont.title)
+                            .foregroundStyle(DesignColor.ink)
+
+                        ForEach(records) { record in
+                            historyCard(record: record)
+                        }
                     }
                 }
+                .padding(.horizontal, DesignSpacing.screen)
+                .padding(.top, DesignSpacing.md)
+                .padding(.bottom, DesignSpacing.xl)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 52)
-            .padding(.bottom, 28)
         }
-        .background(DesignColor.black)
     }
-    
-    private func summaryCard(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(DesignColor.white.opacity(0.5))
-            
-            Text(value)
-                .font(.system(size: 20, weight: .heavy))
-                .foregroundStyle(DesignColor.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 14)
-        .background(DesignColor.white.opacity(0.06))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(DesignColor.white.opacity(0.08), lineWidth: 1)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+
+    private var totalReps: Int {
+        records.map(\.reps).reduce(0, +)
     }
-    
-    private func historyCard(record: WorkoutRecord) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(record.title)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(DesignColor.white)
-                    
+}
+
+private extension RecordView {
+
+    var summary: some View {
+        DSCard(padding: DesignSpacing.md) {
+            HStack(spacing: 0) {
+                DSStat(value: "\(records.count)", label: "운동 횟수")
+
+                divider
+
+                DSStat(value: "\(totalReps)", label: "총 개수")
+
+                divider
+
+                DSStat(value: "약 \(records.map(\.calories).reduce(0, +))", label: "칼로리")
+            }
+        }
+    }
+
+    var divider: some View {
+        Rectangle()
+            .fill(DesignColor.line)
+            .frame(width: 1, height: 32)
+    }
+
+    func historyCard(record: WorkoutRecord) -> some View {
+        DSCard(padding: DesignSpacing.md) {
+            HStack(spacing: DesignSpacing.md) {
+                Image(systemName: "figure.strengthtraining.traditional")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(DesignColor.push.deep)
+                    .frame(width: 46, height: 46)
+                    .background(DesignColor.push.soft, in: RoundedRectangle(cornerRadius: DesignRadius.sm, style: .continuous))
+
+                VStack(alignment: .leading, spacing: DesignSpacing.xs) {
+                    HStack(alignment: .firstTextBaseline, spacing: DesignSpacing.xs) {
+                        Text("\(record.reps)")
+                            .font(DesignFont.numeric(24))
+                            .foregroundStyle(DesignColor.ink)
+
+                        Text("회")
+                            .font(DesignFont.label)
+                            .foregroundStyle(DesignColor.inkMuted)
+                    }
+
                     Text(record.date)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(DesignColor.white.opacity(0.48))
+                        .font(DesignFont.label)
+                        .foregroundStyle(DesignColor.inkMuted)
+                        .lineLimit(1)
                 }
-                
-                Spacer()
-                
-                Text("완료")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(DesignColor.brandOrange)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(DesignColor.brandOrange.opacity(0.14))
-                    .clipShape(Capsule())
-            }
-            
-            HStack(spacing: 12) {
-                metricPill(icon: "figure.strengthtraining.traditional", text: "\(record.reps)회")
-                metricPill(icon: "timer", text: record.duration)
-                metricPill(icon: "flame.fill", text: "\(record.calories)kcal")
+
+                Spacer(minLength: 0)
+
+                VStack(alignment: .trailing, spacing: DesignSpacing.xs) {
+                    DSPill(record.duration, systemImage: "timer", palette: DesignColor.pull)
+                    DSPill("약 \(record.calories)kcal", systemImage: "flame.fill", palette: DesignColor.sunny)
+                }
             }
         }
-        .padding(16)
-        .background(DesignColor.white.opacity(0.05))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(DesignColor.brandOrange.opacity(0.28), lineWidth: 1)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
-    
-    private func metricPill(icon: String, text: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: 11, weight: .bold))
-            Text(text)
-                .font(.system(size: 12, weight: .semibold))
-        }
-        .foregroundStyle(DesignColor.brandOrange)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(DesignColor.brandOrange.opacity(0.12))
-        .clipShape(Capsule())
-    }
+}
+
+#Preview {
+    RecordView()
 }

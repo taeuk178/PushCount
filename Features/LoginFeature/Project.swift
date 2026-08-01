@@ -33,6 +33,10 @@ let project = Project(
                 .project(
                     target: "NetworkKit",
                     path: .relativeToRoot("Modules/NetworkKit")
+                ),
+                .project(
+                    target: "CharacterKit",
+                    path: .relativeToRoot("Modules/CharacterKit")
                 )
             ]
         ),
