@@ -1,10 +1,12 @@
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let targetVersion: String = "26.0"
 
 let project = Project(
     name: "HomeFeature",
+    settings: .automaticSigning,
     targets: [
         .target(
             name: "HomeFeatureInterface",

@@ -1,9 +1,11 @@
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let targetVersion: String = "26.0"
 
 let project = Project(
     name: "NetworkKit",
+    settings: .automaticSigning,
     targets: [
         .target(
             name: "NetworkKit",

@@ -5,6 +5,7 @@ let targetVersion: String = "26.0"
 
 let project = Project(
     name: "DesignSystemKit",
+    settings: .automaticSigning,
     targets: [
         .target(
             name: "DesignSystemKit",
