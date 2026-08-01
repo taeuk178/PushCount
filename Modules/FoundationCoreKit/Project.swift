@@ -1,6 +1,6 @@
 import ProjectDescription
 
-let targetVersion: String = "18.1"
+let targetVersion: String = "26.0"
 
 let project = Project(
     name: "FoundationCoreKit",

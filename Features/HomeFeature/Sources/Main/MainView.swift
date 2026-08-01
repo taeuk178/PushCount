@@ -2,15 +2,22 @@ import SwiftUI
 
 import HomeFeatureInterface
 import DesignSystemKit
+import MotionKit
 
 public struct HomeView: View {
-    
+
     public init() {}
-    
+
     @State private var showingActionView = false
     @State private var todayPushCount = 0
     @State private var selectedExerciseIndex = 0
-    
+    @State private var airPodsMonitor = AirPodsMotionMonitor()
+    @State private var showingAirPodsAlert = false
+    @AppStorage("outdoorWorkoutRecommendationEnabled") private var outdoorWorkoutRecommendationEnabled = false
+
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
+
     private let exercises: [ExerciseCard] = [
         ExerciseCard(
             titleTop: "PUSH",
@@ -49,6 +56,18 @@ public struct HomeView: View {
                     .foregroundStyle(DesignColor.white)
                     .padding(.horizontal, 24)
                     .padding(.top, 12)
+
+                VStack(spacing: 10) {
+                    AirPodsStatusBanner(state: airPodsMonitor.state) {
+                        openAppSettings()
+                    }
+
+                    if outdoorWorkoutRecommendationEnabled {
+                        nearParkBanner
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, -10)
                 
                 VStack(alignment: .leading, spacing: 20) {
                     TabView(selection: $selectedExerciseIndex) {
@@ -67,7 +86,7 @@ public struct HomeView: View {
                             .foregroundStyle(DesignColor.brandOrangeSoft)
                         
                         Button {
-                            showingActionView = true
+                            startWorkout()
                         } label: {
                             HStack(spacing: 8) {
                                 Text("시작하기")
@@ -89,10 +108,78 @@ public struct HomeView: View {
             }
         }
         .fullScreenCover(isPresented: $showingActionView) {
-            ActionView(exerciseTitle: exercises[selectedExerciseIndex].displayName) { completedPushCount in
+            ActionView(
+                exerciseTitle: exercises[selectedExerciseIndex].displayName,
+                motionMonitor: airPodsMonitor
+            ) { completedPushCount in
                 todayPushCount += completedPushCount
             }
         }
+        .task {
+            airPodsMonitor.start()
+        }
+        .onDisappear {
+            airPodsMonitor.stop()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .active: airPodsMonitor.start()
+            case .background: airPodsMonitor.stop()
+            default: break
+            }
+        }
+        .alert("에어팟 착용이 확인되지 않았어요", isPresented: $showingAirPodsAlert) {
+            Button("탭으로 세기") {
+                showingActionView = true
+            }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text(airPodsMonitor.state.message)
+        }
+    }
+
+    /// 에어팟 착용이 확인되면 바로 시작하고, 아니면 탭 카운트로 진행할지 물어본다.
+    private func startWorkout() {
+        if airPodsMonitor.state.isReadyForWorkout {
+            showingActionView = true
+        } else {
+            showingAirPodsAlert = true
+        }
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        openURL(url)
+    }
+
+    private var nearParkBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "location.fill")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(DesignColor.brandOrange)
+                .frame(width: 28, height: 28)
+                .background(DesignColor.settingIconOverlay)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            Text("가까운 공원이 250m 거리에 있습니다")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(DesignColor.white)
+                .lineLimit(1)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(DesignColor.white.opacity(0.75))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(DesignColor.settingCardOverlay)
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(DesignColor.white.opacity(0.15), lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

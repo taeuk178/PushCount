@@ -1,6 +1,6 @@
 import ProjectDescription
 
-let targetVersion: String = "18.1"
+let targetVersion: String = "26.0"
 
 let project = Project(
     name: "PushCount",
@@ -17,6 +17,7 @@ let project = Project(
                         "UIColorName": "",
                         "UIImageName": "",
                     ],
+                    "NSMotionUsageDescription": "에어팟의 움직임으로 운동 횟수를 자동으로 세기 위해 동작 데이터를 사용합니다.",
                 ]
             ),
             sources: ["Sources/**"],

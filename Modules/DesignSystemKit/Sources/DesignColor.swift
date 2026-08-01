@@ -4,9 +4,11 @@ import SwiftUI
 
 public enum DesignColor {
     
-    public static let white = Color.white
-    public static let black = Color.black
+    public static let white = Color(red: 255/255, green: 255/255, blue: 255/255)
+    public static let black = Color(red: 0/255, green: 0/255, blue: 0/255)
     public static let clear = Color.clear
+
+    public static let successGreen = Color(red: 52/255, green: 199/255, blue: 89/255)
 
     public static let brandOrange = Color(red: 255/255, green: 84/255, blue: 0/255)
     public static let brandOrangeSoft = Color(red: 255/255, green: 140/255, blue: 89/255)
@@ -29,4 +31,11 @@ public enum DesignColor {
     public static let homeCardSquat = Color(red: 51/255, green: 36/255, blue: 20/255)
     public static let deepOrangeBackground = Color(red: 36/255, green: 13/255, blue: 3/255)
     public static let deepOrangeBackgroundStrong = Color(red: 41/255, green: 15/255, blue: 3/255)
+
+    public static let appBlueBackground = Color(red: 0/255, green: 48/255, blue: 73/255)
+    public static let appBlueHeader = Color(red: 10/255, green: 60/255, blue: 95/255)
+    public static let settingCardOverlay = Color(red: 216/255, green: 207/255, blue: 159/255).opacity(0.1)
+    public static let settingIconOverlay = Color(red: 247/255, green: 127/255, blue: 0/255).opacity(0.1)
+    public static let toggleTrackOff = Color(red: 51/255, green: 65/255, blue: 85/255)
+    public static let sand200 = Color(red: 234/255, green: 226/255, blue: 183/255)
 }
